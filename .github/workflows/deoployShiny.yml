@@ -1,0 +1,21 @@
+name: Deploy to shinyapps.io
+
+on:
+  push:
+    branches: main
+jobs:
+  build:
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: docker build -t main . 
+      - name: execute
+        run: >
+          docker run 
+          -e SHINY_ACC_NAME=${{ secrets.SHINY_ACC_NAME }} 
+          -e TOKEN=${{secrets.TOKEN}} 
+          -e SECRET=${{secrets.SECRET}} 
+          -e MASTERNAME=${{secrets.MASTER_NAME}} 
+          main
