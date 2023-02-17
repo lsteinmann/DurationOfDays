@@ -55,7 +55,7 @@ ui <- fluidPage(
     )
   ),
   h2("Warning"),
-  p("This app is meant as guidance. I do not guarentee that this is correct 
+  p("This app is meant as guidance. I do not guarantee that this is correct 
         or accepted by the relevant authorities. When staying in a foreign 
         country, always be sure to have a few 'days to spare' in case something
         unexpected happens."),
