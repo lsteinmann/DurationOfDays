@@ -30,7 +30,7 @@ page <- fluidPage(
   ),
   fluidRow(column(9, h2("Settings"))),
   fluidRow(
-    column(3, style = "margin-top: 16pt;", 
+    column(3, style = "margin-top: 15pt;", 
            dateInput(inputId = "plannedEntryInput",
                      label = "Planned Date of Entry",
                      width = "100%")
