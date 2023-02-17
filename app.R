@@ -9,61 +9,132 @@
 
 library(shiny)
 
-ui <- fluidPage(
-  titlePanel("Duration of Days: Calculate the amount of days in a given time span"),
-  
-  p("This app is meant to help you calculate how many days have passed during 
-  two different dates (including the dates themselfes) for multiple date ranges. 
-  This is helpful for getting an idea about your visa allowance."),
-  
-  
-  sidebarLayout(
-    sidebarPanel(
-      p("Enter the dates of entry and exit of your relevant stays here and submit:"),
-      dateRangeInput(inputId = "stayDatesInput",
-                     label = "Date of Entry and Exit"),
-      actionButton(inputId = "storeStayDates", label = "Add stay to list")
+page <- fluidPage(
+  fluidRow(
+    column(9,
+           h1("Duration of Days: Calculate the Permissible Amount of Days 
+              in a Time Span"),
+           p("In many countries, you can stay without a visa or residence 
+           permit for a duration of 90 days. In a lot of cases, this duration 
+           is reset after 180 days have passed. It is often hard to calculate 
+           this using a calendar alone. You can get a rough estimate by counting 
+           the days you have spent in the country in question in the last 6 month. 
+           Usually, the number of days you are allowed to stay is calculated on 
+           the date of entry and does not reset thereafter."),
+           p("This app helps you calculate the number of days during 
+             multiple stays and get a sum of days you have spent. 
+             The maximum number of days as well as the total duration in 
+             which days should be counted can be set (with the defaults 
+             being 90 within the last 180 days)."),
+           hr())
+  ),
+  fluidRow(column(9, h2("Settings"))),
+  fluidRow(
+    column(3, style = "margin-top: 16pt;", 
+           dateInput(inputId = "plannedEntryInput",
+                     label = "Planned Date of Entry",
+                     width = "100%")
     ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      h2("List of Durations / Stays"),
-      tableOutput("staysTable_out")
+    column(3, 
+           numericInput(inputId = "lastNdays", 
+                        value = 180, 
+                        label = "Relevant time span (in days)",
+                        width = "100%")
+    ),
+    column(3, 
+           numericInput(inputId = "permDays", 
+                        value = 90, 
+                        label = "Number of permissible days in time span",
+                        width = "100%")
     )
   ),
-  
-  sidebarLayout(
-    sidebarPanel(
-      
-      numericInput(inputId = "lastNdays", value = 180, label = "Relevant time span (in days)"),
-      numericInput(inputId = "permDays", value = 90, label = "Number of days allowed to stay in time span"),
-      dateInput(inputId = "plannedEntryInput",
-                     label = "Planned Date of Entry")
-    ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      h2("Result"),
-      textOutput("controls"),
-      h3(textOutput("allowedStay"))
+  fluidRow(
+    column(9,
+           htmlOutput("controls")
     )
   ),
-  sidebarLayout(
-    sidebarPanel(
-      actionButton(inputId = "clearAll", label = "Reset")
-    ),
-    mainPanel(
+  fluidRow(
+    column(9,
+           hr(),
+           h2("List of Durations / Stays")
     )
   ),
-  h2("Warning"),
-  p("This app is meant as guidance. I do not guarantee that this is correct 
-        or accepted by the relevant authorities. When staying in a foreign 
-        country, always be sure to have a few 'days to spare' in case something
-        unexpected happens."),
-  h3("For a proper assessment of your situation, always contact the relevant 
-    immigration authorities!")
-  
+  fluidRow(
+    column(6,
+           #p("Enter the dates of entry and exit of your relevant stays here and submit:"),
+           dateRangeInput(inputId = "stayDatesInput",
+                          label = "Date of Entry and Exit",
+                          width = "100%"),
+           style = "margin-top:5px;"
+           ),
+    column(3,
+           actionButton(inputId = "storeStayDates", 
+                        label = "Add stay to list", 
+                        class="btn btn-success",
+                        width = "100%"),
+           style = "margin-top:25px;"
+           )
+  ),
+  fluidRow(
+    column(9, 
+           tableOutput("staysTable_out"), 
+           hr()
+    )
+  ),
+  fluidRow(
+    column(9,
+           h2("Result"),
+           h4(htmlOutput("allowedStay", class="alert alert-success"))
+    )
+  ),
+  fluidRow(
+    column(2),
+    column(5, 
+           actionButton(inputId = "clearAll", 
+                        label = "Reset all values to default", 
+                        icon = icon("rotate"), 
+                        class = "btn-warning",
+                        width = "100%")
+    ),
+    column(2)
+  ),
+  fluidRow(
+    column(9,
+           hr(),
+           h2("Warning"),
+           p("This app is meant as guidance. I do not guarantee that this is 
+           correct or accepted by the relevant authorities. When staying in 
+           a foreign country, always be sure to know the laws applicable in 
+           your situation and to have a few 'days to spare' in case something 
+           unexpected happens."),
+           h3("For a proper assessment of your situation, always contact 
+           the relevant immigration authorities!", 
+              class="alert alert-danger"))
+  )
 )
+
+
+# copied from https://community.rstudio.com/t/shiny-how-to-center-and-fix-width-of-dashboard/3575/5
+ui <- tagList(
+  tags$style("html,body{background-color: white;}
+                .container{
+                    width: 100%;
+                    margin: 0 auto;
+                    padding: 0;
+                }
+                #myimg{
+                    width:30%;
+                }
+               @media screen and (min-width: 900px){
+                .container{
+                    width: 800px;
+                }
+               }"),
+  tags$div(class="container",
+           page)
+  )
+
+
 server <- function(input, output, session) {
   
   currentInput <- reactiveVal()
@@ -96,8 +167,8 @@ server <- function(input, output, session) {
                                            nrow = length(new_staysList)))
     colnames(new_staysTable) <- c("Entry Date", "Exit Date", "Number of Days")
     
-    new_staysTable$`Entry Date` <- lapply(new_staysList, function(x) format(x[[1]]))
-    new_staysTable$`Exit Date` <- lapply(new_staysList, function(x) format(x[[2]]))
+    new_staysTable$`Entry Date` <- lapply(new_staysList, function(x) format(x[[1]], format = "%A, %d.%m.%Y"))
+    new_staysTable$`Exit Date` <- lapply(new_staysList, function(x) format(x[[2]], format = "%A, %d.%m.%Y"))
     
     days <- lapply(new_staysList, FUN = function(x) seq.Date(x[1], x[2], by = 1))
     new_totalDays <- as.Date(unlist(days), origin = "1970-01-01")
@@ -112,22 +183,21 @@ server <- function(input, output, session) {
     staysList(new_staysList)
   })
   
-  output$staysTable_out <- renderTable({
-    staysTable()
-  })
-  
-  output$days <- renderTable({
-    staysTable()
-  })
+  output$staysTable_out <- renderTable(staysTable(), 
+                                       width = "100%",
+                                       striped = TRUE,
+                                       hover = TRUE)
   
   output$controls <- renderText({
     x_days_ago <- input$plannedEntryInput-input$lastNdays
     
-    paste(sep = "", input$lastNdays, " days before your planned entry date was ", 
-          format(x_days_ago, format = "%A, %d.%m.%Y"), ". ",
-          "Make sure to enter all the relevant stays from that date onwards in the 'List of Durations / Stays' above. ",
+    paste(sep = "", 
           "Assuming you are allowed to stay ", input$permDays, 
-          " within the last ", input$lastNdays, " days. ")
+          " within the last ", input$lastNdays, " days. ",
+          input$lastNdays, " days before your planned entry date was <b>", 
+          format(x_days_ago, format = "%A, %d.%m.%Y"), "</b>. ",
+          "Make sure to enter all the relevant stays from that date onwards 
+          in the following 'List of Durations / Stays':")
   })
   
   output$allowedStay <- renderText({
@@ -139,8 +209,8 @@ server <- function(input, output, session) {
     end_day <- date_of_entry + allowed_days
     paste(sep = "", 
           "When entering on ", format(date_of_entry, format = "%A, %d.%m.%Y"),
-          " you are allowed to stay ", allowed_days, " days ",
-          "until ", format(end_day, format = "%A, %d.%m.%Y"), ". ")
+          " you are allowed to stay <b>", allowed_days, " days</b> ",
+          "until <b>", format(end_day, format = "%A, %d.%m.%Y"), "</b>. ")
   })
   
   
