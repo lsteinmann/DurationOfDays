@@ -1,8 +1,10 @@
 # Calculate the Duration of Days
- 
+
 In many countries, you can stay without a visa or residence permit for a duration of 90 days. In a lot of cases, this duration is reset after 180 days have passed. It is often hard to calculate this using a calendar alone. You can get a rough estimate by counting the days you have spent in the country in question in the last 6 month. Usually, the number of days you are allowed to stay is calculated on the date of entry and does not reset thereafter.
 
-This app helps people calculate the number of days during different stays and get a sum of days they have spent within the last 180 days, assuming that the maximum amount allowed is 90.
+This app helps people calculate the number of days during multiple stays and get a sum of days they have spent. The maximum number of days as well as the total duration in which days should be counted can be set (with the defaults being 90 within the last 180 days).
+
+You can use this app at [lsteinmann.shinyapps.io/DurationOfDays/](https://lsteinmann.shinyapps.io/DurationOfDays/).
 
 # Warning
 
