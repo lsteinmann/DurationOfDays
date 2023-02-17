@@ -84,7 +84,7 @@ page <- fluidPage(
   fluidRow(
     column(9,
            h2("Result"),
-           h4(htmlOutput("allowedStay", class="alert alert-success"))
+           h4(htmlOutput("allowedStay", class = "alert alert-success"))
     )
   ),
   fluidRow(
@@ -110,6 +110,19 @@ page <- fluidPage(
            h3("For a proper assessment of your situation, always contact 
            the relevant immigration authorities!", 
               class="alert alert-danger"))
+  ),
+  fluidRow(
+    column(5),
+    column(4,
+           class = "alert alert-dark",
+           tags$div(
+             "Contact me and/or get the code for this app ",
+             tags$a(href="https://github.com/lsteinmann/DurationOfDays", 
+                    "on GitHub!"),
+             icon("github"),
+             align = "right"
+           )
+    )
   )
 )
 
