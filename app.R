@@ -27,6 +27,7 @@ ui <- fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
+      h2("List of Durations / Stays"),
       tableOutput("staysTable_out")
     )
   ),
@@ -123,7 +124,8 @@ server <- function(input, output, session) {
     x_days_ago <- input$plannedEntryInput-input$lastNdays
     
     paste(sep = "", input$lastNdays, " days before your planned entry date was ", 
-          format(x_days_ago, format = "%A, %d.%m.%Y"), ". ", 
+          format(x_days_ago, format = "%A, %d.%m.%Y"), ". ",
+          "Make sure to enter all the relevant stays from that date onwards in the 'List of Durations / Stays' above. ",
           "Assuming you are allowed to stay ", input$permDays, 
           " within the last ", input$lastNdays, " days. ")
   })
