@@ -135,9 +135,6 @@ ui <- tagList(
                     margin: 0 auto;
                     padding: 0;
                 }
-                #myimg{
-                    width:30%;
-                }
                @media screen and (min-width: 900px){
                 .container{
                     width: 800px;
