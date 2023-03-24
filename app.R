@@ -56,7 +56,7 @@ page <- fluidPage(
   fluidRow(
     column(9,
            hr(),
-           h2("List of Durations / Stays")
+           h2("Previous Durations / Stays")
     )
   ),
   fluidRow(
@@ -69,7 +69,7 @@ page <- fluidPage(
            ),
     column(3,
            actionButton(inputId = "storeStayDates", 
-                        label = "Add stay to list", 
+                        label = "Add to list", 
                         class="btn btn-success",
                         width = "100%"),
            style = "margin-top:25px;"
