@@ -223,8 +223,8 @@ server <- function(input, output, session) {
           " within the last ", input$lastNdays, " days. ",
           input$lastNdays, " days before your planned entry date was <b>", 
           format(x_days_ago(), format = "%A, %d.%m.%Y"), "</b>. ",
-          "Make sure to enter all the relevant stays from that date onwards 
-          in the following 'List of Durations / Stays':")
+          "Make sure to enter at least all the relevant stays from that 
+          date onwards under 'Previous Durations / Stays' below:")
   })
   
   output$allowedStay <- renderText({
