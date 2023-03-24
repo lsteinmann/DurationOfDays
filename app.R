@@ -151,12 +151,10 @@ server <- function(input, output, session) {
   
   staysList <- reactiveVal()
   totalDays <- reactiveVal()
-  staysTable <- reactiveVal()
   
   observeEvent(input$clearAll, { 
     staysList(NULL)
     totalDays(NULL)
-    staysTable(NULL)
     updateNumericInput(session, "lastNdays", value = 180)
     updateTextInput(session, "permDays", value = 90)
   })
@@ -169,28 +167,45 @@ server <- function(input, output, session) {
     currentStays <- staysList()
     newStay <- list(currentInput())
     
-    new_staysList <- append(currentStays, newStay, after = length(currentStays))
+    new_staysList <- append(currentStays, 
+                            newStay, 
+                            after = length(currentStays))
     
-    #new_staysList <- list(c(as.Date("2022-11-01"), as.Date("2022-11-10")), c(as.Date("2023-01-01"), as.Date("2023-01-10")))
-    
-    new_staysTable <- as.data.frame(matrix(ncol = 3, 
-                                           nrow = length(new_staysList)))
-    colnames(new_staysTable) <- c("Entry Date", "Exit Date", "Number of Days")
-    
-    new_staysTable$`Entry Date` <- lapply(new_staysList, function(x) format(x[[1]], format = "%A, %d.%m.%Y"))
-    new_staysTable$`Exit Date` <- lapply(new_staysList, function(x) format(x[[2]], format = "%A, %d.%m.%Y"))
-    
-    days <- lapply(new_staysList, FUN = function(x) seq.Date(x[1], x[2], by = 1))
+    days <- lapply(new_staysList, function(x) seq.Date(x[1], x[2], by = 1))
     new_totalDays <- as.Date(unlist(days), origin = "1970-01-01")
     
+    totalDays(new_totalDays)
+    staysList(new_staysList)
+  })
+  
+  staysTable <- reactive({
+    
+    validate(need(staysList(), "Enter the dates of your previous stays."))
+    
+    new_staysTable <- as.data.frame(matrix(ncol = 4, 
+                                           nrow = length(staysList())))
+    
+    colnames(new_staysTable) <- c("Entry Date", "Exit Date", 
+                                  "Number of Days", "Counted Days")
+    
+    new_staysTable$`Entry Date` <- lapply(staysList(), 
+                                          function(x) 
+                                            format(x[[1]], 
+                                                   format = "%A, %d.%m.%Y"))
+    
+    new_staysTable$`Exit Date` <- lapply(staysList(), 
+                                         function(x) 
+                                           format(x[[2]], 
+                                                  format = "%A, %d.%m.%Y"))
+    
+    days <- lapply(staysList(), function(x) seq.Date(x[1], x[2], by = 1))
+    relevant_days <- lapply(days, function(x) sum(x > x_days_ago()))
     days <- lapply(days, length)
     
     new_staysTable$`Number of Days` <- unlist(days)
+    new_staysTable$`Counted Days` <- as.integer(relevant_days)
     
-    #seq.Date(x[1], x[2], by = 1)
-    totalDays(new_totalDays)
-    staysTable(new_staysTable)
-    staysList(new_staysList)
+    return(new_staysTable)
   })
   
   output$staysTable_out <- renderTable(staysTable(), 
@@ -198,14 +213,16 @@ server <- function(input, output, session) {
                                        striped = TRUE,
                                        hover = TRUE)
   
+  x_days_ago <- reactiveVal()
+  
   output$controls <- renderText({
-    x_days_ago <- input$plannedEntryInput-input$lastNdays
+    x_days_ago(input$plannedEntryInput-input$lastNdays)
     
     paste(sep = "", 
           "Assuming you are allowed to stay ", input$permDays, 
           " within the last ", input$lastNdays, " days. ",
           input$lastNdays, " days before your planned entry date was <b>", 
-          format(x_days_ago, format = "%A, %d.%m.%Y"), "</b>. ",
+          format(x_days_ago(), format = "%A, %d.%m.%Y"), "</b>. ",
           "Make sure to enter all the relevant stays from that date onwards 
           in the following 'List of Durations / Stays':")
   })
